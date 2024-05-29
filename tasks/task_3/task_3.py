@@ -58,7 +58,7 @@ class DocumentProcessor:
 
                 # Step 2: Process the temporary file
                 #####################################
-                loader = PyPDFLoader("example_data/layout-parser-paper.pdf")
+                loader = PyPDFLoader(temp_file_path)
                 pages = loader.load_and_split()
                 self.pages.extend(pages)
                 # Use PyPDFLoader here to load the PDF and extract pages.
