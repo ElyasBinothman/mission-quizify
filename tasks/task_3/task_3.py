@@ -57,10 +57,7 @@ class DocumentProcessor:
                     f.write(uploaded_file.getvalue())
 
                 # Step 2: Process the temporary file
-                #####################################
-                loader = PyPDFLoader(temp_file_path)
-                pages = loader.load_and_split()
-                self.pages.extend(pages)
+                ####################################
                 # Use PyPDFLoader here to load the PDF and extract pages.
                 # https://python.langchain.com/docs/modules/data_connection/document_loaders/pdf#using-pypdf
                 # You will need to figure out how to use PyPDFLoader to process the temporary file.
