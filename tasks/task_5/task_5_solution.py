@@ -58,23 +58,25 @@ class ChromaCollectionCreator:
         # https://python.langchain.com/docs/modules/data_connection/document_transformers/character_text_splitter
         # [Your code here for splitting documents]
         text_splitter = CharacterTextSplitter(
-        separator="\n\n",
-        chunk_size=1000,
-        chunk_overlap=200,
-        length_function=len,
-        is_separator_regex=False,
+            separator="\n\n",
+            chunk_size=1000,
+            chunk_overlap=200,
+            length_function=len,
+            is_separator_regex=False,
         )
-        texts = text_splitter.create_documents([self.processor.pages])
-        print(texts[0])
+        texts = text_splitter.split_text(self.processor.pages)  # Corrected this line
+        
         
         if texts is not None:
             st.success(f"Successfully split pages to {len(texts)} documents!", icon="✅")
-
+        else:
+            st.error("Failed to split documents.", icon="🚨")
+            return
         # Step 3: Create the Chroma Collection
         # https://docs.trychroma.com/
         # Create a Chroma in-memory client using the text chunks and the embeddings model
         # [Your code here for creating Chroma collection]
-        db = Chroma.from_documents(texts, self.embed_model)
+        self.db = Chroma.from_documents(texts, self.embed_model)
         if self.db:
             st.success("Successfully created Chroma Collection!", icon="✅")
         else:
@@ -90,11 +92,13 @@ class ChromaCollectionCreator:
         if self.db:
             docs = self.db.similarity_search_with_relevance_scores(query)
             if docs:
-                return docs[0]
+                return docs[0][0]
             else:
                 st.error("No matching documents found!", icon="🚨")
         else:
             st.error("Chroma Collection has not been created!", icon="🚨")
+        
+        
 
 if __name__ == "__main__":
     processor = DocumentProcessor() # Initialize from Task 3
@@ -102,12 +106,11 @@ if __name__ == "__main__":
     
     embed_config = {
         "model_name": "textembedding-gecko@003",
-        "project": "YOUR PROJECT ID HERE",
+        "project": "my-first-project-424120",
         "location": "us-central1"
     }
     
     embed_client = EmbeddingClient(**embed_config) # Initialize from Task 4
-    
     chroma_creator = ChromaCollectionCreator(processor, embed_client)
     
     with st.form("Load Data to Chroma"):
