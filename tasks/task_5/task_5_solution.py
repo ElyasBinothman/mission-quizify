@@ -9,7 +9,7 @@ from tasks.task_4.task_4 import EmbeddingClient
 # Import Task libraries
 from langchain_core.documents import Document
 from langchain.text_splitter import CharacterTextSplitter
-from langchain_community.vectorstores import Chroma
+from langchain import Chroma
 
 class ChromaCollectionCreator:
     def __init__(self, processor, embed_model):
