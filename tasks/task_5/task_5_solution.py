@@ -1,9 +1,11 @@
 import sys
 import os
+from annotated_types import doc
+from posthog import page
 import streamlit as st
 sys.path.append(os.path.abspath('../../'))
-from tasks.task_3.task_3 import DocumentProcessor
-from tasks.task_4.task_4 import EmbeddingClient
+from tasks.task_3.task_3_solution import DocumentProcessor
+from tasks.task_4.task_4_solution import EmbeddingClient
 
 
 # Import Task libraries
@@ -52,19 +54,19 @@ class ChromaCollectionCreator:
         if len(self.processor.pages) == 0:
             st.error("No documents found!", icon="🚨")
             return
-
+        
         # Step 2: Split documents into text chunks
         # Use a TextSplitter from Langchain to split the documents into smaller text chunks
         # https://python.langchain.com/docs/modules/data_connection/document_transformers/character_text_splitter
         # [Your code here for splitting documents]
         text_splitter = CharacterTextSplitter(
-            separator="\n\n",
-            chunk_size=1000,
-            chunk_overlap=200,
-            length_function=len,
-            is_separator_regex=False,
-        )
-        texts = text_splitter.split_text(self.processor.pages)  # Corrected this line
+                separator="\n\n",
+                chunk_size=1000,
+                chunk_overlap=200,
+                length_function=len,
+                is_separator_regex=False,
+            )
+        texts = text_splitter.split_documents(self.processor.pages)
         
         
         if texts is not None:
@@ -92,7 +94,7 @@ class ChromaCollectionCreator:
         if self.db:
             docs = self.db.similarity_search_with_relevance_scores(query)
             if docs:
-                return docs[0][0]
+                return docs[0]
             else:
                 st.error("No matching documents found!", icon="🚨")
         else:
