@@ -53,16 +53,27 @@ if __name__ == "__main__":
     with screen.container():
         st.header("Quizzify")
         ####### YOUR CODE HERE #######
+        processor = DocumentProcessor() # Initialize from Task 3
+        processor.ingest_documents()
+    
+        embed_config = {
+            "model_name": "textembedding-gecko@003",
+            "project": "my-first-project-424120",
+            "location": "us-central1"
+        }
+        embed_client = EmbeddingClient(**embed_config) # Initialize from Task 4
         # 1) Initalize DocumentProcessor and Ingest Documents from Task 3
         # 2) Initalize the EmbeddingClient from Task 4 with embed config
-        # 3) Initialize the ChromaCollectionCreator from Task 5
+        chroma_creator = ChromaCollectionCreator(processor, embed_client)
         ####### YOUR CODE HERE #######
 
         with st.form("Load Data to Chroma"):
             st.subheader("Quiz Builder")
             st.write("Select PDFs for Ingestion, the topic for the quiz, and click Generate!")
-            
+            st.chat_input("select PDFs for Ingestion, the topic for the quiz")
             ####### YOUR CODE HERE #######
+            User_input = st.chat_input("Type a query")
+            
             # 4) Use streamlit widgets to capture the user's input
             # 4) for the quiz topic and the desired number of questions
             ####### YOUR CODE HERE #######
