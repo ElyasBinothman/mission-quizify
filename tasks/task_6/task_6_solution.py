@@ -40,7 +40,7 @@ Implementation Guidance:
 """
 
 if __name__ == "__main__":
-    st.header("Quizzify")
+    #st.header("Quizzify")
 
     # Configuration for EmbeddingClient
     embed_config = {
@@ -55,12 +55,6 @@ if __name__ == "__main__":
         ####### YOUR CODE HERE #######
         processor = DocumentProcessor() # Initialize from Task 3
         processor.ingest_documents()
-    
-        embed_config = {
-            "model_name": "textembedding-gecko@003",
-            "project": "my-first-project-424120",
-            "location": "us-central1"
-        }
         embed_client = EmbeddingClient(**embed_config) # Initialize from Task 4
         # 1) Initalize DocumentProcessor and Ingest Documents from Task 3
         # 2) Initalize the EmbeddingClient from Task 4 with embed config
@@ -70,10 +64,8 @@ if __name__ == "__main__":
         with st.form("Load Data to Chroma"):
             st.subheader("Quiz Builder")
             st.write("Select PDFs for Ingestion, the topic for the quiz, and click Generate!")
-            st.chat_input("select PDFs for Ingestion, the topic for the quiz")
-            ####### YOUR CODE HERE #######
-            User_input = st.chat_input("Type a query")
-            
+            text_field =st.text_input("Type the subject of the quiz")
+            slider = st.slider("Number of questions", min_value=1, max_value=10, value=1,step=1)
             # 4) Use streamlit widgets to capture the user's input
             # 4) for the quiz topic and the desired number of questions
             ####### YOUR CODE HERE #######
@@ -85,7 +77,8 @@ if __name__ == "__main__":
                 ####### YOUR CODE HERE #######
                 # 5) Use the create_chroma_collection() method to create a Chroma collection from the processed documents
                 ####### YOUR CODE HERE #######
-                    
+                collection = chroma_creator.create_chroma_collection()
+                document = chroma_creator.query_chroma_collection(text_field)
                 # Uncomment the following lines to test the query_chroma_collection() method
                 # document = chroma_creator.query_chroma_collection(topic_input) 
                 
