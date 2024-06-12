@@ -7,13 +7,16 @@ sys.path.append(os.path.abspath('../../'))
 from tasks.task_3.task_3_solution import DocumentProcessor
 from tasks.task_4.task_4_solution import EmbeddingClient
 
-
 # Import Task libraries
 from langchain_core.documents import Document
 from langchain.text_splitter import CharacterTextSplitter
-from langchain_community.vectorstores import Chroma
-
+from langchain.vectorstores import Chroma
+from google.cloud import aiplatform
 class ChromaCollectionCreator:
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:\Elyas\Rdical AI\mission-quizify\Authentication.json"
+
+    # Initialize the Vertex AI client
+    aiplatform.init(project='my-first-project-424120', location='us-central1')
     def __init__(self, processor, embed_model):
         """
         Initializes the ChromaCollectionCreator with a DocumentProcessor instance and embeddings configuration.
