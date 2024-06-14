@@ -13,10 +13,7 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 from google.cloud import aiplatform
 class ChromaCollectionCreator:
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:\Elyas\Rdical AI\mission-quizify\Authentication.json"
-
-    # Initialize the Vertex AI client
-    aiplatform.init(project='my-first-project-424120', location='us-central1')
+    
     def __init__(self, processor, embed_model):
         """
         Initializes the ChromaCollectionCreator with a DocumentProcessor instance and embeddings configuration.
@@ -26,6 +23,7 @@ class ChromaCollectionCreator:
         self.processor = processor      # This will hold the DocumentProcessor from Task 3
         self.embed_model = embed_model  # This will hold the EmbeddingClient from Task 4
         self.db = None                  # This will hold the Chroma collection
+    
     
     def create_chroma_collection(self):
         """
@@ -81,6 +79,7 @@ class ChromaCollectionCreator:
         # https://docs.trychroma.com/
         # Create a Chroma in-memory client using the text chunks and the embeddings model
         # [Your code here for creating Chroma collection]
+        
         self.db = Chroma.from_documents(texts, self.embed_model)
         if self.db:
             st.success("Successfully created Chroma Collection!", icon="✅")
@@ -94,6 +93,7 @@ class ChromaCollectionCreator:
         
         Returns the first matching document from the collection with similarity score.
         """
+        
         if self.db:
             docs = self.db.similarity_search_with_relevance_scores(query)
             if docs:
@@ -103,7 +103,16 @@ class ChromaCollectionCreator:
         else:
             st.error("Chroma Collection has not been created!", icon="🚨")
         
+    def as_retriever(self):
+        """
+        Converts the ChromaCollectionCreator into a retriever.
         
+        Returns a retriever object from the Chroma collection.
+        """
+        if self.db:
+            return self.db.as_retriever()
+        else:
+            raise AttributeError("Chroma Collection has not been created!")
 
 if __name__ == "__main__":
     processor = DocumentProcessor() # Initialize from Task 3

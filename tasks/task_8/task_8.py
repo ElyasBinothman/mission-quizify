@@ -78,9 +78,9 @@ class QuizGenerator:
 
         :return: A JSON object representing the generated quiz question.
         """
-        if not self.llm:
+        if self.llm is None:
             self.init_llm()
-        if not self.vectorstore:
+        if  self.vectorstore is None:
             raise ValueError("Vectorstore not provided.")
         
         from langchain_core.runnables import RunnablePassthrough, RunnableParallel

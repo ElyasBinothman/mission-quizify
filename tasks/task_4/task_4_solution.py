@@ -1,6 +1,7 @@
 # embedding_client.py
 
 from langchain_google_vertexai import VertexAIEmbeddings
+from google.oauth2 import service_account
 
 class EmbeddingClient:
     """
@@ -32,11 +33,15 @@ class EmbeddingClient:
     def __init__(self, model_name, project, location):
         # Initialize the VertexAIEmbeddings client with the given parameters
         # Read about the VertexAIEmbeddings wrapper from Langchain here
+        credentials = service_account.Credentials.from_service_account_file(
+            'D:\\Radical AI test\\mission-quizify\\Authentication.json'
+        )
         # https://python.langchain.com/docs/integrations/text_embedding/google_generative_ai
         self.client = VertexAIEmbeddings(
             model_name = model_name,
             project=project,
-            location=location
+            location=location,
+            credentials=credentials
         )
         
     def embed_query(self, query):

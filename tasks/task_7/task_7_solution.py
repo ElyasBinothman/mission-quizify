@@ -1,6 +1,7 @@
 import streamlit as st
-from langchain_google_vertexai import VertexAI
+from langchain_google_vertexai import VectorSearchVectorStore, VectorSearchVectorStoreDatastore, VertexAI
 from langchain_core.prompts import PromptTemplate
+from langchain.vectorstores import Chroma
 import os
 import sys
 sys.path.append(os.path.abspath('../../'))
@@ -104,14 +105,14 @@ class QuizGenerator:
         ############# YOUR CODE HERE ############
         # Initialize the LLM from the 'init_llm' method if not already initialized
         # Raise an error if the vectorstore is not initialized on the class
-        if self.llm is None:
+        if not self.llm:
             self.init_llm()
-        if self.vectorstore is None:
+        if not self.vectorstore:
             raise ValueError ("Vectorstore is not initialized on the class!!")
         ############# YOUR CODE HERE ############
         
         from langchain_core.runnables import RunnablePassthrough, RunnableParallel
-
+        
         ############# YOUR CODE HERE ############
         # Enable a Retriever using the as_retriever() method on the VectorStore object
         
