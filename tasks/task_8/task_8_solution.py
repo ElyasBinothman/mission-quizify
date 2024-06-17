@@ -178,9 +178,8 @@ class QuizGenerator:
         # Iterate over the existing questions in `question_bank`
         for existing_question in self.question_bank:
             if question_text == existing_question['question']:
-                print("Duplicate question detected.")
                 return False
-        print("Question is unique.")
+            
         return True
 
 
