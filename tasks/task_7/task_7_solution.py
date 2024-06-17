@@ -73,7 +73,7 @@ class QuizGenerator:
         """
         self.llm = VertexAI(
             model_name = ("gemini-pro"),
-            temperature = 0.7,
+            temperature = 0.8,
             max_output_tokens = 500
         )
         

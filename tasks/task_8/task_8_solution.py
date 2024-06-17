@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath('../../'))
 from tasks.task_3.task_3_solution import DocumentProcessor
 from tasks.task_4.task_4_solution import EmbeddingClient
 from tasks.task_5.task_5_solution import ChromaCollectionCreator
-
+from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_google_vertexai import VertexAI
 
@@ -33,7 +33,7 @@ class QuizGenerator:
 
         self.vectorstore = vectorstore
         self.llm = None
-        self.question_bank = [] # Initialize the question bank to store questions
+        self.question_bank = []
         self.system_template = """
             You are a subject matter expert on the topic: {topic}
             
@@ -58,6 +58,7 @@ class QuizGenerator:
             
             Context: {context}
             """
+        self.json_output_parser = JsonOutputParser()
     
     def init_llm(self):
         """
@@ -70,7 +71,7 @@ class QuizGenerator:
         """
         self.llm = VertexAI(
             model_name = "gemini-pro",
-            temperature = 0.8, # Increased for less deterministic questions 
+            temperature = 0.8, 
             max_output_tokens = 500
         )
 
@@ -82,26 +83,20 @@ class QuizGenerator:
         """
         if self.llm is None:
             self.init_llm()
-        if  self.vectorstore is None:
+        if self.vectorstore is None:
             raise ValueError("Vectorstore not provided.")
         
         from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 
-        # Enable a Retriever
         retriever = self.vectorstore.as_retriever()
         
-        # Use the system template to create a PromptTemplate
         prompt = PromptTemplate.from_template(self.system_template)
         
-        # RunnableParallel allows Retriever to get relevant documents
-        # RunnablePassthrough allows chain.invoke to send self.topic to LLM
         setup_and_retrieval = RunnableParallel(
             {"context": retriever, "topic": RunnablePassthrough()}
         )
-        # Create a chain with the Retriever, PromptTemplate, and LLM
-        chain = setup_and_retrieval | prompt | self.llm 
+        chain = setup_and_retrieval | prompt | self.llm | self.json_output_parser
 
-        # Invoke the chain with the topic as input
         response = chain.invoke(self.topic)
         return response
 
@@ -123,67 +118,41 @@ class QuizGenerator:
 
         Note: This method relies on `generate_question_with_vectorstore` for question generation and `validate_question` for ensuring question uniqueness. Ensure `question_bank` is properly initialized and managed.
         """
-        self.question_bank = [] # Reset the question bank
+        self.question_bank = []
 
         for _ in range(self.num_questions):
-            ##### YOUR CODE HERE #####
-            question_str = self.generate_question_with_vectorstore()# Use class method to generate question
+            question_str = self.generate_question_with_vectorstore()
             
-            ##### YOUR CODE HERE #####
-            try:
-                question = json.loads(question_str)
-                # Convert the JSON String to a dictionary
-            except json.JSONDecodeError:
-                print("Failed to decode question JSON.")
-                continue  # Skip this iteration if JSON decoding fails
-            ##### YOUR CODE HERE #####
+            # Check if the response is already a dictionary
+            if isinstance(question_str, dict):
+                question = question_str
+            else:
+                try:
+                    question = json.loads(question_str)
+                except json.JSONDecodeError:
+                    print("Failed to decode question JSON.")
+                    continue
 
-            ##### YOUR CODE HERE #####
-            # Validate the question using the validate_question method
             if self.validate_question(question):
                 print("Successfully generated unique question")
-                # Add the valid and unique question to the bank
                 self.question_bank.append(question)
             else:
                 print("Duplicate or invalid question detected.")
-            ##### YOUR CODE HERE #####
 
         return self.question_bank
 
     def validate_question(self, question: dict) -> bool:
-        """
-        Task: Validate a quiz question for uniqueness within the generated quiz.
-
-        This method checks if the provided question (as a dictionary) is unique based on its text content compared to previously generated questions stored in `question_bank`. The goal is to ensure that no duplicate questions are added to the quiz.
-
-        Steps:
-            1. Extract the question text from the provided dictionary.
-            2. Iterate over the existing questions in `question_bank` and compare their texts to the current question's text.
-            3. If a duplicate is found, return False to indicate the question is not unique.
-            4. If no duplicates are found, return True, indicating the question is unique and can be added to the quiz.
-
-        Parameters:
-        - question: A dictionary representing the generated quiz question, expected to contain at least a "question" key.
-
-        Returns:
-        - A boolean value: True if the question is unique, False otherwise.
-
-        Note: This method assumes `question` is a valid dictionary and `question_bank` has been properly initialized.
-        """
         if 'question' not in question:
             return False
 
         question_text = question['question']
 
-        # Iterate over the existing questions in `question_bank`
         for existing_question in self.question_bank:
             if question_text == existing_question['question']:
                 return False
             
         return True
 
-
-# Test Generating the Quiz
 if __name__ == "__main__":
     
     embed_config = {
@@ -198,7 +167,7 @@ if __name__ == "__main__":
         processor = DocumentProcessor()
         processor.ingest_documents()
     
-        embed_client = EmbeddingClient(**embed_config) # Initialize from Task 4
+        embed_client = EmbeddingClient(**embed_config)
     
         chroma_creator = ChromaCollectionCreator(processor, embed_client)
     
@@ -218,7 +187,6 @@ if __name__ == "__main__":
                 
                 st.write(topic_input)
                 
-                # Test the Quiz Generator
                 generator = QuizGenerator(topic_input, questions, chroma_creator)
                 question_bank = generator.generate_quiz()
                 question = question_bank[0]

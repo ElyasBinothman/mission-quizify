@@ -61,7 +61,7 @@ class ChromaCollectionCreator:
         # https://python.langchain.com/docs/modules/data_connection/document_transformers/character_text_splitter
         # [Your code here for splitting documents]
         text_splitter = CharacterTextSplitter(
-                separator="\n\n",
+                separator="\n",
                 chunk_size=1000,
                 chunk_overlap=200,
                 length_function=len,
