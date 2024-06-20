@@ -28,7 +28,7 @@ class QuizManager:
         """
         ##### YOUR CODE HERE #####
         self.questions = questions
-        self.total_questions =  len(questions)
+        self.total_questions =  len(self.questions)
     ##########################################################
 
     def get_question_at_index(self, index: int):
@@ -63,7 +63,7 @@ class QuizManager:
         Note: Ensure that `st.session_state["question_index"]` is initialized before calling this method. This navigation method enhances the user experience by providing fluid access to quiz questions.
         """
         ##### YOUR CODE HERE #####
-        curIndex = st.session_state("question_index")
+        curIndex = st.session_state["question_index"]
         newIndex = (curIndex + direction) % self.total_questions
         st.session_state["question_index"] = newIndex
 
