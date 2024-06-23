@@ -38,17 +38,17 @@ Additionally, download and install [Git for Windows](https://gitforwindows.org/)
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/gemeni-quizify.git
+   git clone https://github.com/yourusername/gemeni-quizify
    ```
 
 2. Navigate to the project directory:
    ```
-   cd gemeni-quizify
+   cd mission-quizify
    ```
 
 3. Run the Streamlit application:
    ```
-   streamlit run app.py
+   streamlit run QuizGenorator.py
    ```
 
 4. Upload a document through the web interface.
