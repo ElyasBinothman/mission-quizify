@@ -1,7 +1,7 @@
 # Gemeni Quizify Quiz Generator
 
 ## Description
-Gemeni Quizify is an AI-powered bot that generates questions based on a topic entered by the user from a document they have uploaded. This project leverages state-of-the-art natural language processing techniques to create quizzes that are tailored to specific topics within the provided documents.
+Gemeni Quizify is an AI-powered bot that generates questions based on a topic entered by the user from a document they have uploaded. This project leverages state-of-the-art natural language processing techniques to create quizzes that are tailored to specific topics within the provided documents. The code utilizes Vertex AI from Google API and incorporates Langchain for natural language processing capabilities.
 
 ## Installation
 
