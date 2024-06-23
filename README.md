@@ -72,15 +72,3 @@ We welcome contributions! To contribute:
 3. Make your changes and commit them (`git commit -m 'Add new feature'`).
 4. Push to the branch (`git push origin feature-branch`).
 5. Open a pull request.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Credits/Acknowledgments
-
-- Special thanks to the developers of Streamlit, Chromadb, Langchain, and PyPDF for their excellent libraries.
-
-## Contact Information
-
-For questions or support, please open an issue in this repository or contact the project maintainer at [your-email@example.com].
