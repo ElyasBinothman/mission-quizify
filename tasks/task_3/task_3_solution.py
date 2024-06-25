@@ -53,7 +53,7 @@ class DocumentProcessor:
                 os.unlink(temp_file_path)
             
             # Display the total number of pages processed
-            st.write(f"Total pages processed: {len(self.pages)}")
+            #st.write(f"Total pages processed: {len(self.pages)}") NOTE: This line is commented out because it is not necessary to display the total number of pages extracted from all uploaded documents.
         
 if __name__ == "__main__":
     processor = DocumentProcessor()

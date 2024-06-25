@@ -56,7 +56,7 @@ class ChromaCollectionCreator:
         texts = text_splitter.split_documents(self.processor.pages)
 
         if texts:
-            st.success(f"Successfully split pages to {len(texts)} documents!", icon="✅")
+            st.success(f"Successfully split documents to {len(texts)} pages!", icon="✅")
         else:
             st.error("Failed to split documents.", icon="🚨")
             return
