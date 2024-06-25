@@ -13,24 +13,20 @@ from langchain_core.prompts import PromptTemplate
 from langchain_google_vertexai import VertexAI
 
 class QuizGenerator:
+    """
+    Initializes the QuizGenerator with a required topic, the number of questions for the quiz,
+    and an optional vectorstore for querying related information.
+
+    :param topic: A string representing the required topic of the quiz.
+    :param num_questions: An integer representing the number of questions to generate for the quiz, up to a maximum of 10.
+    :param vectorstore: An optional vectorstore instance (e.g., ChromaDB) to be used for querying information related to the quiz topic.
+    """
+
     def __init__(self, topic=None, num_questions=1, vectorstore=None):
-        """
-        Initializes the QuizGenerator with a required topic, the number of questions for the quiz,
-        and an optional vectorstore for querying related information.
-
-        :param topic: A string representing the required topic of the quiz.
-        :param num_questions: An integer representing the number of questions to generate for the quiz, up to a maximum of 10.
-        :param vectorstore: An optional vectorstore instance (e.g., ChromaDB) to be used for querying information related to the quiz topic.
-        """
-        if not topic:
-            self.topic = "General Knowledge"
-        else:
-            self.topic = topic
-
+        self.topic = topic if topic else "General Knowledge"
         if num_questions > 10:
             raise ValueError("Number of questions cannot exceed 10.")
         self.num_questions = num_questions
-
         self.vectorstore = vectorstore
         self.llm = None
         self.question_bank = []
@@ -66,18 +62,16 @@ class QuizGenerator:
 
         This method should handle any setup required to interact with the LLM, including authentication,
         setting up any necessary parameters, or selecting a specific model.
-
-        :return: An instance or configuration for the LLM.
         """
         self.llm = VertexAI(
-            model_name = "gemini-pro",
-            temperature = 0.8, 
-            max_output_tokens = 500
+            model_name="gemini-pro",
+            temperature=0.8, 
+            max_output_tokens=500
         )
 
     def generate_question_with_vectorstore(self):
         """
-        Generates a quiz question based on the topic provided using a vectorstore
+        Generates a quiz question based on the topic provided using a vectorstore.
 
         :return: A JSON object representing the generated quiz question.
         """
@@ -89,7 +83,6 @@ class QuizGenerator:
         from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 
         retriever = self.vectorstore.as_retriever()
-        
         prompt = PromptTemplate.from_template(self.system_template)
         
         setup_and_retrieval = RunnableParallel(
@@ -102,21 +95,9 @@ class QuizGenerator:
 
     def generate_quiz(self) -> list:
         """
-        Task: Generate a list of unique quiz questions based on the specified topic and number of questions.
+        Generates a list of unique quiz questions based on the specified topic and number of questions.
 
-        This method orchestrates the quiz generation process by utilizing the `generate_question_with_vectorstore` method to generate each question and the `validate_question` method to ensure its uniqueness before adding it to the quiz.
-
-        Steps:
-            1. Initialize an empty list to store the unique quiz questions.
-            2. Loop through the desired number of questions (`num_questions`), generating each question via `generate_question_with_vectorstore`.
-            3. For each generated question, validate its uniqueness using `validate_question`.
-            4. If the question is unique, add it to the quiz; if not, attempt to generate a new question (consider implementing a retry limit).
-            5. Return the compiled list of unique quiz questions.
-
-        Returns:
-        - A list of dictionaries, where each dictionary represents a unique quiz question generated based on the topic.
-
-        Note: This method relies on `generate_question_with_vectorstore` for question generation and `validate_question` for ensuring question uniqueness. Ensure `question_bank` is properly initialized and managed.
+        :return: A list of dictionaries, where each dictionary represents a unique quiz question generated based on the topic.
         """
         self.question_bank = []
 
@@ -142,6 +123,12 @@ class QuizGenerator:
         return self.question_bank
 
     def validate_question(self, question: dict) -> bool:
+        """
+        Validates the uniqueness of a generated question.
+
+        :param question: A dictionary representing a quiz question.
+        :return: True if the question is unique, False otherwise.
+        """
         if 'question' not in question:
             return False
 
@@ -154,39 +141,37 @@ class QuizGenerator:
         return True
 
 if __name__ == "__main__":
-    
     embed_config = {
         "model_name": "textembedding-gecko@003",
         "project": "my-first-project-424120",
         "location": "us-central1"
     }
-    
+
     screen = st.empty()
     with screen.container():
         st.header("Quiz Builder")
         processor = DocumentProcessor()
         processor.ingest_documents()
-    
+
         embed_client = EmbeddingClient(**embed_config)
-    
+
         chroma_creator = ChromaCollectionCreator(processor, embed_client)
-    
+
         question = None
         question_bank = None
-    
+
         with st.form("Load Data to Chroma"):
             st.subheader("Quiz Builder")
             st.write("Select PDFs for Ingestion, the topic for the quiz, and click Generate!")
-            
+
             topic_input = st.text_input("Topic for Generative Quiz", placeholder="Enter the topic of the document")
             questions = st.slider("Number of Questions", min_value=1, max_value=10, value=1)
-            
+
             submitted = st.form_submit_button("Submit")
             if submitted:
                 chroma_creator.create_chroma_collection()
-                
                 st.write(topic_input)
-                
+
                 generator = QuizGenerator(topic_input, questions, chroma_creator)
                 question_bank = generator.generate_quiz()
                 question = question_bank[0]
@@ -194,6 +179,13 @@ if __name__ == "__main__":
     if question_bank:
         screen.empty()
         with st.container():
-            st.header("Generated Quiz Question: ")
+            st.header("Generated Quiz Question:")
             for question in question_bank:
                 st.write(question)
+
+# For more information on Streamlit, refer to:
+# https://docs.streamlit.io/
+# For more information on VertexAI, refer to:
+# https://cloud.google.com/vertex-ai/docs
+# For more information on Chroma, refer to:
+# https://docs.trychroma.com/
