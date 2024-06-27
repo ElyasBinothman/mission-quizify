@@ -126,21 +126,25 @@ if __name__ == "__main__":
                 correct_count = st.session_state.correct_answers
                 total_questions = len(st.session_state['question_bank'])
                 percentage = (correct_count / total_questions) * 100
-                st.write(f"You got {percentage:.2f}%")
-                st.write(f"You answered {correct_count} out of {total_questions} questions correctly.")
-                for idx, question in enumerate(st.session_state['question_bank']):
-                    if idx in st.session_state.answers:
-                        st.write(f"Question {idx + 1}: {question['question']}")
-                        user_answer = st.session_state.answers[idx]
-                        correct_answer = question['answer']
-                        if user_answer.startswith(correct_answer):
-                            st.success("Correct!", icon="✅")
-                            st.write(f"Your answer: {user_answer}")
-                            st.write(f"Correct answer: {correct_answer}")
-                        else:
-                            st.error("Incorrect!", icon="❌")
-                            st.write(f"Your answer: {user_answer}")
-                            st.write(f"Correct answer: {correct_answer}")
-                        st.write(f"Explanation: {question['explanation']}")
-                        st.write("---")
+                with st.form("Review Answers"):
+                    st.write(f"You got {percentage:.2f}%")
+                    st.write(f"You answered {correct_count} out of {total_questions} questions correctly.")
+                    for idx, question in enumerate(st.session_state['question_bank']):
+                        if idx in st.session_state.answers:
+                            st.write(f"Question {idx + 1}: {question['question']}")
+                            user_answer = st.session_state.answers[idx]
+                            correct_answer = question['answer']
+                            if user_answer.startswith(correct_answer):
+                                st.success("Correct!", icon="✅")
+                                st.write(f"Your answer: {user_answer}")
+                                st.write(f"Correct answer: {correct_answer}")
+                            else:
+                                st.error("Incorrect!", icon="❌")
+                                st.write(f"Your answer: {user_answer}")
+                                st.write(f"Correct answer: {correct_answer}")
+                            st.write(f"Explanation: {question['explanation']}")
+                            st.write("---")
 
+                    if st.form_submit_button("Back to questions"):
+                        previous_page()
+                        st.rerun()
