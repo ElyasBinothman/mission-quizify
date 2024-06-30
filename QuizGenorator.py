@@ -24,6 +24,8 @@ if __name__ == "__main__":
         st.session_state.correct_answers = 0
     if 'answers' not in st.session_state:
         st.session_state.answers = {}
+    if 'submitted_answers' not in st.session_state:
+        st.session_state.submitted_answers = 0
     def next_page():
         st.session_state.page += 1
 
@@ -36,7 +38,8 @@ if __name__ == "__main__":
         st.session_state['display_quiz'] = False
         st.session_state['question_index'] = 0
         st.session_state.correct_answers = 0
-        
+        st.session_state.answers = {} 
+        st.session_state.submitted_answers = 0
 
     # Sidebar for navigation
     with st.sidebar.expander("Navigation", expanded=True):
@@ -94,18 +97,10 @@ if __name__ == "__main__":
                 st.write(f"{st.session_state['question_index'] + 1}. {index_question['question']}")
                 with st.form("MCQ"):
                     answer = st.radio("Choose an answer", choices, index=None, disabled=st.session_state["question_index"] in st.session_state.answers)
-                
-
-                    if st.form_submit_button("Next Question"):
-                        quiz_manager.next_question_index(direction=1)
-                        st.rerun()
-
-                    if st.form_submit_button("Previous Question"):
-                        quiz_manager.next_question_index(direction=-1)
-                        st.rerun()
-
+                    
                     if st.form_submit_button("Submit Answer") and answer is not None:
                         st.session_state.answers[st.session_state["question_index"]] = answer
+                        st.session_state.submitted_answers += 1 
                         correct_answer = index_question['answer']
                         if answer.startswith(correct_answer):
                             st.success("Correct!", icon="✅")
@@ -114,9 +109,22 @@ if __name__ == "__main__":
                             st.error("Incorrect!",icon="❌")
                         st.write(f"Explanation: {index_question['explanation']}")
                         st.rerun()
-                    if st.form_submit_button("Review"):
-                        next_page()
+                        
+                    if st.form_submit_button("Next Question"):
+                        quiz_manager.next_question_index(direction=1)
                         st.rerun()
+
+                    if st.form_submit_button("Previous Question"):
+                        quiz_manager.next_question_index(direction=-1)
+                        st.rerun()
+            if st.session_state.submitted_answers >= len(st.session_state['question_bank']):
+                if st.button("Results"):
+                    next_page()
+                    st.rerun()
+
+                    
+                    
+                    
 
     if st.session_state.page == 2:
         if st.session_state['display_quiz']:
@@ -148,3 +156,4 @@ if __name__ == "__main__":
                     if st.form_submit_button("Back to questions"):
                         previous_page()
                         st.rerun()
+
